@@ -3,20 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Island Fest Gallery</title>
+    <title>アイランドフェス ギャラリー</title>
     <style>
-        /* --- 全体設定 --- */
+        /* --- ここにCSS（デザイン）を書いています --- */
         body {
             margin: 0;
             padding: 30px;
             background-color: #ffffff;
-            font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
             display: flex;
             justify-content: center;
-            overflow-x: hidden; /* 拡大時のはみ出しによる横揺れ防止 */
+            overflow-x: hidden;
         }
 
-        /* --- ギャラリーのグリッド（2列×3行） --- */
         .gallery-container {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -26,8 +24,7 @@
             position: relative;
         }
 
-        /* --- 背景暗転（オーバーレイ） --- */
-        /* コンテナの疑似要素として作成 */
+        /* 背景暗転の設定 */
         .gallery-container::before {
             content: "";
             position: fixed;
@@ -35,26 +32,25 @@
             left: 0;
             width: 100vw;
             height: 100vh;
-            background: rgba(0, 0, 0, 0.75); /* 暗さの調整 */
+            background: rgba(0, 0, 0, 0.75);
             opacity: 0;
             visibility: hidden;
-            z-index: 50; /* 通常画像(1)と拡大画像(100)の間 */
-            pointer-events: none; /* マウスを透過させてガタつきを防止 */
+            z-index: 50;
+            pointer-events: none;
             transition: all 0.3s ease;
-            transition-delay: 0s; /* 消えるときは一瞬 */
+            transition-delay: 0s;
         }
 
-        /* どれかの画像がホバーされたら暗転開始（0.3秒の溜め） */
+        /* ホバーされた時の暗転（0.3秒の溜め） */
         .gallery-container:has(.gallery-item:hover)::before {
             opacity: 1;
             visibility: visible;
-            transition-delay: 0.3s; /* 誤作動防止の待機時間 */
+            transition-delay: 0.3s;
         }
 
-        /* --- 各画像アイテム --- */
         .gallery-item {
             position: relative;
-            aspect-ratio: 16 / 9; /* プレゼンスライドの比率 */
+            aspect-ratio: 16 / 9;
             z-index: 1;
         }
 
@@ -65,62 +61,45 @@
             border-radius: 10px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
             cursor: pointer;
-            
-            /* 戻るときの挙動設定 */
             transition: all 0.2s ease-out;
             transition-delay: 0s; 
-            
-            /* 拡大時のガタつき防止 */
-            will-change: transform, position;
         }
 
-        /* --- ホバー（拡大）時の挙動 --- */
+        /* ホバー時の拡大設定（0.3秒の溜め） */
         .gallery-item:hover {
-            z-index: 100; /* 背後の画像(image6等)を確実に追い抜く */
+            z-index: 100;
         }
 
         .gallery-item:hover img {
             position: fixed;
             top: 50%;
             left: 50%;
-            /* 画面中央に配置しつつ1.6倍に拡大 */
             transform: translate(-50%, -50%) scale(1.6);
-            
-            width: 85vw; /* Notion埋め込み枠内での幅 */
+            width: 85vw;
             max-width: 800px;
             height: auto;
             aspect-ratio: 16 / 9;
-            
             box-shadow: 0 30px 60px rgba(0,0,0,0.7);
-            z-index: 101; /* 暗転レイヤーより上 */
-            
-            /* 出てくるときの挙動設定（0.3秒待ってから、少し弾むように動く） */
+            z-index: 101;
             transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
             transition-delay: 0.3s;
         }
 
-        /* --- スマホ表示用（1列にする） --- */
         @media (max-width: 600px) {
-            .gallery-container {
-                grid-template-columns: 1fr;
-            }
-            .gallery-item:hover img {
-                width: 90vw;
-                transform: translate(-50%, -50%) scale(1.1);
-            }
+            .gallery-container { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
 
-<div class="gallery-container">
-    <div class="gallery-item"><img src="images/slide1.jpg" alt="Slide 1"></div>
-    <div class="gallery-item"><img src="images/slide2.jpg" alt="Slide 2"></div>
-    <div class="gallery-item"><img src="images/slide3.jpg" alt="Slide 3"></div>
-    <div class="gallery-item"><img src="images/slide4.jpg" alt="Slide 4"></div>
-    <div class="gallery-item"><img src="images/slide5.jpg" alt="Slide 5"></div>
-    <div class="gallery-item"><img src="images/slide6.jpg" alt="Slide 6"></div>
-</div>
+    <div class="gallery-container">
+        <div class="gallery-item"><img src="images/slide1.jpg" alt="Slide 1"></div>
+        <div class="gallery-item"><img src="images/slide2.jpg" alt="Slide 2"></div>
+        <div class="gallery-item"><img src="images/slide3.jpg" alt="Slide 3"></div>
+        <div class="gallery-item"><img src="images/slide4.jpg" alt="Slide 4"></div>
+        <div class="gallery-item"><img src="images/slide5.jpg" alt="Slide 5"></div>
+        <div class="gallery-item"><img src="images/slide6.jpg" alt="Slide 6"></div>
+    </div>
 
 </body>
 </html>
