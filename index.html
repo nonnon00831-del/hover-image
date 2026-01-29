@@ -1,59 +1,74 @@
-/* --- 共通設定 --- */
-.gallery-item img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 8px;
-    cursor: pointer;
-    /* 戻る時の速度（0sにすると一瞬で戻ります） */
-    transition: all 0.2s ease-out; 
-    transition-delay: 0s; /* 戻る時は遅延させない */
-}
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Island Fest Gallery</title>
+    <style>
+        /* --- 全体設定 --- */
+        body {
+            margin: 0;
+            padding: 30px;
+            background-color: #ffffff;
+            font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+            display: flex;
+            justify-content: center;
+            overflow-x: hidden; /* 拡大時のはみ出しによる横揺れ防止 */
+        }
 
-/* --- 背景暗転の遅延設定 --- */
-.gallery-container::before {
-    content: "";
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(0, 0, 0, 0.7);
-    opacity: 0;
-    visibility: hidden;
-    z-index: 10;
-    pointer-events: none;
-    /* 背景も画像と同じタイミングで暗くする */
-    transition: all 0.3s ease;
-    transition-delay: 0s;
-}
+        /* --- ギャラリーのグリッド（2列×3行） --- */
+        .gallery-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            width: 100%;
+            max-width: 900px;
+            position: relative;
+        }
 
-/* ホバーされた時の「溜め」の設定 */
-.gallery-container:has(.gallery-item:hover)::before {
-    opacity: 1;
-    visibility: visible;
-    transition-delay: 0.3s; /* 0.3秒乗せ続けて初めて暗くなる */
-}
+        /* --- 背景暗転（オーバーレイ） --- */
+        /* コンテナの疑似要素として作成 */
+        .gallery-container::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.75); /* 暗さの調整 */
+            opacity: 0;
+            visibility: hidden;
+            z-index: 50; /* 通常画像(1)と拡大画像(100)の間 */
+            pointer-events: none; /* マウスを透過させてガタつきを防止 */
+            transition: all 0.3s ease;
+            transition-delay: 0s; /* 消えるときは一瞬 */
+        }
 
-/* --- ホバー（拡大）の遅延設定 --- */
-.gallery-item:hover {
-    z-index: 100;
-}
+        /* どれかの画像がホバーされたら暗転開始（0.3秒の溜め） */
+        .gallery-container:has(.gallery-item:hover)::before {
+            opacity: 1;
+            visibility: visible;
+            transition-delay: 0.3s; /* 誤作動防止の待機時間 */
+        }
 
-.gallery-item:hover img {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%) scale(1.5);
-    
-    width: 80vw;
-    max-width: 700px;
-    height: auto;
-    aspect-ratio: 16 / 9;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.8);
-    z-index: 101;
+        /* --- 各画像アイテム --- */
+        .gallery-item {
+            position: relative;
+            aspect-ratio: 16 / 9; /* プレゼンスライドの比率 */
+            z-index: 1;
+        }
 
-    /* 【重要】ここがポイント */
-    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); /* 少し弾むような動き */
-    transition-delay: 0.3s; /* 0.3秒間マウスを置かないと拡大しない */
-}
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            cursor: pointer;
+            
+            /* 戻るときの挙動設定 */
+            transition: all 0.2s ease-out;
+            transition-delay: 0s; 
+            
+            /* 拡大時のガタつき防止 */
+            will
