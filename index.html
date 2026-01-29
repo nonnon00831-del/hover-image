@@ -3,186 +3,188 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>アイランドフェス ギャラリー（ナビ付）</title>
+    <title>Island Fest Presentation</title>
     <style>
         body {
             margin: 0;
-            padding: 30px;
-            background-color: #ffffff;
+            padding: 20px;
+            background: #fff;
             display: flex;
-            flex-direction: column;
-            align-items: center;
-            overflow-x: hidden;
+            justify-content: center;
             font-family: sans-serif;
         }
 
+        /* ギャラリー外枠 */
         .gallery-container {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
+            gap: 15px;
             width: 100%;
-            max-width: 900px;
-            position: relative;
+            max-width: 800px;
         }
 
-        /* 背景暗転 */
+        /* 背景暗転レイヤー（共通） */
         .gallery-container::before {
             content: "";
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: rgba(0, 0, 0, 0.8);
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background: rgba(0, 0, 0, 0.85);
             opacity: 0;
             visibility: hidden;
-            z-index: 50;
+            z-index: 100;
             transition: 0.3s;
-            pointer-events: none;
         }
-        /* ホバーまたはクリック（ターゲット）時に暗転 */
+        /* ホバーまたはクリック時に暗くする */
         .gallery-container:has(.gallery-item:hover)::before,
         .gallery-container:has(.gallery-item:target)::before {
             opacity: 1;
             visibility: visible;
-            transition-delay: 0.2s;
         }
 
         .gallery-item {
+            position: relative;
             aspect-ratio: 16 / 9;
-            z-index: 1;
         }
 
         .gallery-item img {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            border-radius: 10px;
+            border-radius: 8px;
             cursor: pointer;
-            transition: all 0.2s ease-out;
+            transition: transform 0.3s ease;
         }
 
-        /* --- ボタンのスタイル --- */
-        .nav-buttons {
-            position: fixed;
-            bottom: 5%; /* 画像の下側に配置 */
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 100px; /* ボタン同士の間隔 */
-            opacity: 0;
-            visibility: hidden;
-            z-index: 102;
-            transition: 0.3s;
-        }
-
-        .nav-buttons a {
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-            text-decoration: none;
-            font-size: 40px;
-            font-weight: bold;
-            padding: 10px 30px;
-            border-radius: 50px;
-            backdrop-filter: blur(5px);
-            border: 1px solid rgba(255,255,255,0.3);
-            transition: 0.2s;
-        }
-
-        .nav-buttons a:hover {
-            background: rgba(255, 255, 255, 0.4);
-            transform: scale(1.1);
-        }
-
-        /* --- ホバー＆クリック時の拡大挙動 --- */
-        .gallery-item:hover, .gallery-item:target {
-            z-index: 100;
-        }
-
-        /* ホバーまたはクリックされた画像本体 */
-        .gallery-item:hover img, .gallery-item:target img {
+        /* --- 【重要】ホバー & クリック時の拡大処理 --- */
+        .gallery-item:hover img,
+        .gallery-item:target img {
             position: fixed;
             top: 50%;
             left: 50%;
-            transform: translate(-50%, -50%) scale(1.6);
+            transform: translate(-50%, -50%) scale(1.5);
             width: 80vw;
-            max-width: 800px;
+            max-width: 700px;
             height: auto;
-            aspect-ratio: 16 / 9;
-            z-index: 101;
-            box-shadow: 0 30px 60px rgba(0,0,0,0.8);
-            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-            transition-delay: 0.2s;
+            z-index: 200; /* 暗転より上 */
+            box-shadow: 0 20px 50px rgba(0,0,0,1);
         }
 
-        /* ボタンを表示させる（画像が拡大されている時だけ） */
-        .gallery-item:hover .nav-buttons, 
-        .gallery-item:target .nav-buttons {
+        /* --- ナビゲーションボタン --- */
+        .nav-btns {
+            position: fixed;
+            bottom: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 200px; /* ボタンを左右に離す */
+            z-index: 300; /* 画像よりさらに上 */
+            opacity: 0;
+            visibility: hidden;
+            transition: 0.3s;
+        }
+
+        /* ホバーまたはクリックされている時だけボタンを出す */
+        .gallery-item:hover .nav-btns,
+        .gallery-item:target .nav-btns {
             opacity: 1;
             visibility: visible;
-            transition-delay: 0.4s; /* 画像が大きくなった後に表示 */
         }
 
-        /* スマホ対応 */
-        @media (max-width: 600px) {
-            .gallery-container { grid-template-columns: 1fr; }
-            .nav-buttons { gap: 50px; }
+        .nav-btns a {
+            text-decoration: none;
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+            font-size: 24px;
+            font-weight: bold;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
+
+        .nav-btns a:hover {
+            background: #fff;
+            transform: scale(1.2);
+        }
+
+        /* 拡大を閉じるための×ボタン（画像外クリックの代わり） */
+        .close-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            color: white;
+            font-size: 30px;
+            text-decoration: none;
+            z-index: 300;
+            display: none;
+        }
+        .gallery-item:target .close-btn {
+            display: block;
+        }
+
     </style>
 </head>
 <body>
 
-    <div class="gallery-container">
-        <div class="gallery-item" id="slide1">
-            <img src="images/slide1.jpg">
-            <div class="nav-buttons">
-                <a href="#slide6">＜</a>
-                <a href="#slide2">＞</a>
-            </div>
+<div class="gallery-container">
+    <div class="gallery-item" id="slide1">
+        <a href="#slide1"><img src="images/slide1.jpg"></a>
+        <div class="nav-btns">
+            <a href="#slide6">❮</a>
+            <a href="#slide2">❯</a>
         </div>
-
-        <div class="gallery-item" id="slide2">
-            <img src="images/slide2.jpg">
-            <div class="nav-buttons">
-                <a href="#slide1">＜</a>
-                <a href="#slide3">＞</a>
-            </div>
-        </div>
-
-        <div class="gallery-item" id="slide3">
-            <img src="images/slide3.jpg">
-            <div class="nav-buttons">
-                <a href="#slide2">＜</a>
-                <a href="#slide4">＞</a>
-            </div>
-        </div>
-
-        <div class="gallery-item" id="slide4">
-            <img src="images/slide4.jpg">
-            <div class="nav-buttons">
-                <a href="#slide3">＜</a>
-                <a href="#slide5">＞</a>
-            </div>
-        </div>
-
-        <div class="gallery-item" id="slide5">
-            <img src="images/slide5.jpg">
-            <div class="nav-buttons">
-                <a href="#slide4">＜</a>
-                <a href="#slide6">＞</a>
-            </div>
-        </div>
-
-        <div class="gallery-item" id="slide6">
-            <img src="images/slide6.jpg">
-            <div class="nav-buttons">
-                <a href="#slide5">＜</a>
-                <a href="#slide1">＞</a>
-            </div>
-        </div>
+        <a href="#" class="close-btn">×</a>
     </div>
 
-    <p style="margin-top: 50px; color: #888; font-size: 12px;">※画像の外をクリックするとリセットされます</p>
+    <div class="gallery-item" id="slide2">
+        <a href="#slide2"><img src="images/slide2.jpg"></a>
+        <div class="nav-btns">
+            <a href="#slide1">❮</a>
+            <a href="#slide3">❯</a>
+        </div>
+        <a href="#" class="close-btn">×</a>
+    </div>
+
+    <div class="gallery-item" id="slide3">
+        <a href="#slide3"><img src="images/slide3.jpg"></a>
+        <div class="nav-btns">
+            <a href="#slide2">❮</a>
+            <a href="#slide4">❯</a>
+        </div>
+        <a href="#" class="close-btn">×</a>
+    </div>
+
+    <div class="gallery-item" id="slide4">
+        <a href="#slide4"><img src="images/slide4.jpg"></a>
+        <div class="nav-btns">
+            <a href="#slide3">❮</a>
+            <a href="#slide5">❯</a>
+        </div>
+        <a href="#" class="close-btn">×</a>
+    </div>
+
+    <div class="gallery-item" id="slide5">
+        <a href="#slide5"><img src="images/slide5.jpg"></a>
+        <div class="nav-btns">
+            <a href="#slide4">❮</a>
+            <a href="#slide6">❯</a>
+        </div>
+        <a href="#" class="close-btn">×</a>
+    </div>
+
+    <div class="gallery-item" id="slide6">
+        <a href="#slide6"><img src="images/slide6.jpg"></a>
+        <div class="nav-btns">
+            <a href="#slide5">❮</a>
+            <a href="#slide1">❯</a>
+        </div>
+        <a href="#" class="close-btn">×</a>
+    </div>
+</div>
 
 </body>
 </html>
