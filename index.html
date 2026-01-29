@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>Hover Image</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: transparent;
+    }
+
+    img {
+      width: 200px;
+      transition: transform 0.3s ease;
+      cursor: pointer;
+    }
+
+    img:hover {
+      transform: scale(2);
+      z-index: 10;
+    }
+  </style>
+</head>
+<body>
+  <img src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee" alt="sample image">
+</body>
+</html>
