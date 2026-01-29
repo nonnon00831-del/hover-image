@@ -3,49 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>アイランドフェス ギャラリー</title>
+    <title>アイランドフェス ギャラリー（最適化版）</title>
     <style>
-        /* --- ここにCSS（デザイン）を書いています --- */
+        /* --- 1. 余白を極限まで減らす設定 --- */
         body {
             margin: 0;
-            padding: 30px;
+            padding: 0; /* 余白をゼロに */
             background-color: #ffffff;
             display: flex;
             justify-content: center;
             overflow-x: hidden;
+            font-family: sans-serif;
         }
 
         .gallery-container {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
-            width: 100%;
-            max-width: 900px;
+            gap: 4px; /* 画像同士の隙間も最小限に（0でもOK） */
+            width: 100vw; /* 画面の横幅いっぱいに広げる */
+            max-width: 100%; 
             position: relative;
         }
 
-        /* 背景暗転の設定 */
+        /* --- 2. チカチカ防止用の背景暗転レイヤー --- */
         .gallery-container::before {
             content: "";
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: rgba(0, 0, 0, 0.75);
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background: rgba(0, 0, 0, 0.8);
             opacity: 0;
             visibility: hidden;
             z-index: 50;
-            pointer-events: none;
-            transition: all 0.3s ease;
-            transition-delay: 0s;
+            transition: opacity 0.3s ease;
+            pointer-events: none; /* 暗転レイヤー自体はマウスを無視 */
         }
 
-        /* ホバーされた時の暗転（0.3秒の溜め） */
-        .gallery-container:has(.gallery-item:hover)::before {
+        /* ホバーまたはクリック（ターゲット）時に暗転 */
+        .gallery-container:has(.gallery-item:hover)::before,
+        .gallery-container:has(.gallery-item:target)::before {
             opacity: 1;
             visibility: visible;
-            transition-delay: 0.3s;
         }
 
         .gallery-item {
@@ -58,47 +56,119 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
             cursor: pointer;
             transition: all 0.2s ease-out;
-            transition-delay: 0s; 
+            /* チカチカ防止のまじない */
+            will-change: transform;
+            backface-visibility: hidden;
         }
 
-        /* ホバー時の拡大設定（0.3秒の溜め） */
-        .gallery-item:hover {
-            z-index: 100;
+        /* --- 3. 拡大挙動（フリッカー対策済み） --- */
+        .gallery-item:hover, .gallery-item:target {
+            z-index: 100; /* 常に最前面 */
         }
 
-        .gallery-item:hover img {
+        .gallery-item:hover img, .gallery-item:target img {
             position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%) scale(1.6);
-            width: 85vw;
+            width: 90vw; /* 拡大サイズを少し大きく調整 */
             max-width: 800px;
             height: auto;
             aspect-ratio: 16 / 9;
-            box-shadow: 0 30px 60px rgba(0,0,0,0.7);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.8);
             z-index: 101;
+            /* 拡大時のアニメーションを滑らかに */
             transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transition-delay: 0.1s; /* わずかな遅延がフリッカーを抑えます */
+        }
+
+        /* --- 4. ナビゲーションボタン（左右移動） --- */
+        .nav-btns {
+            position: fixed;
+            bottom: 8%;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 150px;
+            z-index: 200;
+            opacity: 0;
+            visibility: hidden;
+            transition: 0.3s;
+        }
+
+        /* 拡大時のみボタン表示 */
+        .gallery-item:hover .nav-btns, .gallery-item:target .nav-btns {
+            opacity: 1;
+            visibility: visible;
             transition-delay: 0.3s;
         }
 
+        .nav-btns a {
+            text-decoration: none;
+            background: rgba(255, 255, 255, 0.9);
+            color: #000;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-weight: bold;
+            font-size: 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        /* 閉じるためのエリア（画像外をクリックで戻る用） */
+        .close-area {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            z-index: 40;
+            display: none;
+        }
+        .gallery-item:target .close-area { display: block; }
+
         @media (max-width: 600px) {
             .gallery-container { grid-template-columns: 1fr; }
+            .nav-btns { gap: 60px; }
         }
     </style>
 </head>
 <body>
 
     <div class="gallery-container">
-        <div class="gallery-item"><img src="images/slide1.jpg" alt="Slide 1"></div>
-        <div class="gallery-item"><img src="images/slide2.jpg" alt="Slide 2"></div>
-        <div class="gallery-item"><img src="images/slide3.jpg" alt="Slide 3"></div>
-        <div class="gallery-item"><img src="images/slide4.jpg" alt="Slide 4"></div>
-        <div class="gallery-item"><img src="images/slide5.jpg" alt="Slide 5"></div>
-        <div class="gallery-item"><img src="images/slide6.jpg" alt="Slide 6"></div>
+        <div class="gallery-item" id="s1">
+            <a href="#s1"><img src="images/slide1.jpg" alt="1"></a>
+            <div class="nav-btns"><a href="#s6">❮</a><a href="#s2">❯</a></div>
+            <a href="#" class="close-area"></a>
+        </div>
+        <div class="gallery-item" id="s2">
+            <a href="#s2"><img src="images/slide2.jpg" alt="2"></a>
+            <div class="nav-btns"><a href="#s1">❮</a><a href="#s3">❯</a></div>
+            <a href="#" class="close-area"></a>
+        </div>
+        <div class="gallery-item" id="s3">
+            <a href="#s3"><img src="images/slide3.jpg" alt="3"></a>
+            <div class="nav-btns"><a href="#s2">❮</a><a href="#s4">❯</a></div>
+            <a href="#" class="close-area"></a>
+        </div>
+        <div class="gallery-item" id="s4">
+            <a href="#s4"><img src="images/slide4.jpg" alt="4"></a>
+            <div class="nav-btns"><a href="#s3">❮</a><a href="#s5">❯</a></div>
+            <a href="#" class="close-area"></a>
+        </div>
+        <div class="gallery-item" id="s5">
+            <a href="#s5"><img src="images/slide5.jpg" alt="5"></a>
+            <div class="nav-btns"><a href="#s4">❮</a><a href="#s6">❯</a></div>
+            <a href="#" class="close-area"></a>
+        </div>
+        <div class="gallery-item" id="s6">
+            <a href="#s6"><img src="images/slide6.jpg" alt="6"></a>
+            <div class="nav-btns"><a href="#s5">❮</a><a href="#s1">❯</a></div>
+            <a href="#" class="close-area"></a>
+        </div>
     </div>
 
 </body>
