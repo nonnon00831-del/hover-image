@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Island Fest Gallery - Final</title>
+    <title>Island Fest Gallery - Adjusted</title>
     <style>
-        /* --- 1. 基本リセット（余白を徹底的に排除） --- */
+        /* --- 1. 基本リセット --- */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -19,22 +19,22 @@
             display: block;
         }
 
-        /* --- 2. ギャラリー外枠（2列グリッド） --- */
+        /* --- 2. ギャラリー外枠（ホバー前は完璧とのことなので維持） --- */
         .gallery-container {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 2px; /* 画像同士の隙間。0にすれば完全に密着します */
+            gap: 2px;
             width: 100%;
             margin: 0;
         }
 
-        /* --- 3. 背景暗転（overlay） --- */
+        /* --- 3. 背景暗転 --- */
         .gallery-container::before {
             content: "";
             position: fixed;
             top: 0; left: 0;
-            width: 100vw; height: 100vh;
-            background: rgba(0, 0, 0, 0.85);
+            width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.8);
             opacity: 0;
             visibility: hidden;
             z-index: 100;
@@ -42,19 +42,17 @@
             pointer-events: none;
         }
 
-        /* ホバーまたはクリック（ターゲット）時に暗転を起動 */
         .gallery-container:has(.gallery-item:hover)::before,
         .gallery-container:has(.gallery-item:target)::before {
             opacity: 1;
             visibility: visible;
         }
 
-        /* --- 4. 各画像アイテムの基本設定 --- */
+        /* --- 4. 画像アイテム --- */
         .gallery-item {
             position: relative;
             aspect-ratio: 16 / 9;
             width: 100%;
-            overflow: visible;
         }
 
         .gallery-item img {
@@ -64,12 +62,11 @@
             display: block;
             cursor: pointer;
             transition: all 0.3s ease;
-            /* チカチカ防止用 */
             backface-visibility: hidden;
             will-change: transform;
         }
 
-        /* --- 5. ホバー & クリック時の拡大挙動 --- */
+        /* --- 5. ホバー & クリック時の拡大（ここを微調整しました） --- */
         .gallery-item:hover,
         .gallery-item:target {
             z-index: 200;
@@ -80,86 +77,76 @@
             position: fixed;
             top: 50%;
             left: 50%;
+            /* 拡大率を 1.6 -> 1.3 に落として枠内への収まりを優先 */
             transform: translate(-50%, -50%) scale(1.3);
-            width: 95vw; /* Notion枠内での拡大サイズ */
-            max-width: 750px;
+            
+            /* 幅を 90vw -> 95% に。Notionの枠に対して5%の余裕を持たせます */
+            width: 95%; 
+            max-width: 750px; /* あまりに大きくなりすぎないよう制限 */
             height: auto;
             aspect-ratio: 16 / 9;
             z-index: 201;
-            box-shadow: 0 30px 60px rgba(0,0,0,0.8);
-            /* チカチカ防止：ホバー発火をわずかに遅らせる */
-            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-            transition-delay: 0.1s;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+            
+            transition: all 0.35s cubic-bezier(0.25, 1, 0.5, 1);
+            transition-delay: 0.05s;
         }
 
-        /* --- 6. ナビゲーションボタン（左右移動） --- */
+        /* --- 6. ナビゲーションボタン --- */
         .nav-btns {
             position: fixed;
-            bottom: 10%;
+            bottom: 12%; /* ボタンが画像に被りすぎないよう少し下げ */
             left: 50%;
             transform: translateX(-50%);
             display: flex;
-            gap: 150px; /* ボタン同士の距離 */
+            gap: 120px; 
             z-index: 300;
             opacity: 0;
             visibility: hidden;
             transition: opacity 0.3s ease;
         }
 
-        /* 画像が拡大されている時だけボタンを表示 */
         .gallery-item:hover .nav-btns,
         .gallery-item:target .nav-btns {
             opacity: 1;
             visibility: visible;
-            transition-delay: 0.4s;
+            transition-delay: 0.3s;
         }
 
         .nav-btns a {
             text-decoration: none;
-            background: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.95);
             color: #000;
-            width: 55px;
-            height: 55px;
+            width: 48px;
+            height: 48px;
             display: flex;
             align-items: center;
             justify-content: center;
             border-radius: 50%;
-            font-size: 24px;
+            font-size: 20px;
             font-weight: bold;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
-            transition: transform 0.2s;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
         }
 
-        .nav-btns a:hover {
-            transform: scale(1.15);
-            background: #fff;
-        }
-
-        /* --- 7. 閉じるためのエリア（画像の外をクリックで戻る） --- */
+        /* --- 7. 閉じるエリア --- */
         .close-layer {
             position: fixed;
             top: 0; left: 0;
-            width: 100vw; height: 100vh;
+            width: 100%; height: 100%;
             z-index: 150;
             display: none;
-            cursor: default;
         }
         .gallery-item:target .close-layer {
             display: block;
         }
 
-        /* --- 8. スマホ対応（1列） --- */
+        /* --- 8. スマホ対応 --- */
         @media (max-width: 600px) {
-            .gallery-container {
-                grid-template-columns: 1fr;
-            }
-            .nav-btns {
-                gap: 60px;
-            }
-            .gallery-item:hover img,
-            .gallery-item:target img {
-                width: 95vw;
-                transform: translate(-50%, -50%) scale(1.1);
+            .gallery-container { grid-template-columns: 1fr; }
+            .nav-btns { gap: 40px; }
+            .gallery-item:hover img, .gallery-item:target img {
+                width: 92%;
+                transform: translate(-50%, -50%) scale(1.05);
             }
         }
     </style>
@@ -169,55 +156,32 @@
     <div class="gallery-container">
         <div class="gallery-item" id="s1">
             <a href="#s1"><img src="images/slide1.jpg" alt="Slide 1"></a>
-            <div class="nav-btns">
-                <a href="#s6">❮</a>
-                <a href="#s2">❯</a>
-            </div>
+            <div class="nav-btns"><a href="#s6">❮</a><a href="#s2">❯</a></div>
             <a href="#" class="close-layer"></a>
         </div>
-
         <div class="gallery-item" id="s2">
             <a href="#s2"><img src="images/slide2.jpg" alt="Slide 2"></a>
-            <div class="nav-btns">
-                <a href="#s1">❮</a>
-                <a href="#s3">❯</a>
-            </div>
+            <div class="nav-btns"><a href="#s1">❮</a><a href="#s3">❯</a></div>
             <a href="#" class="close-layer"></a>
         </div>
-
         <div class="gallery-item" id="s3">
             <a href="#s3"><img src="images/slide3.jpg" alt="Slide 3"></a>
-            <div class="nav-btns">
-                <a href="#s2">❮</a>
-                <a href="#s4">❯</a>
-            </div>
+            <div class="nav-btns"><a href="#s2">❮</a><a href="#s4">❯</a></div>
             <a href="#" class="close-layer"></a>
         </div>
-
         <div class="gallery-item" id="s4">
             <a href="#s4"><img src="images/slide4.jpg" alt="Slide 4"></a>
-            <div class="nav-btns">
-                <a href="#s3">❮</a>
-                <a href="#s5">❯</a>
-            </div>
+            <div class="nav-btns"><a href="#s3">❮</a><a href="#s5">❯</a></div>
             <a href="#" class="close-layer"></a>
         </div>
-
         <div class="gallery-item" id="s5">
             <a href="#s5"><img src="images/slide5.jpg" alt="Slide 5"></a>
-            <div class="nav-btns">
-                <a href="#s4">❮</a>
-                <a href="#s6">❯</a>
-            </div>
+            <div class="nav-btns"><a href="#s4">❮</a><a href="#s6">❯</a></div>
             <a href="#" class="close-layer"></a>
         </div>
-
         <div class="gallery-item" id="s6">
             <a href="#s6"><img src="images/slide6.jpg" alt="Slide 6"></a>
-            <div class="nav-btns">
-                <a href="#s5">❮</a>
-                <a href="#s1">❯</a>
-            </div>
+            <div class="nav-btns"><a href="#s5">❮</a><a href="#s1">❯</a></div>
             <a href="#" class="close-layer"></a>
         </div>
     </div>
