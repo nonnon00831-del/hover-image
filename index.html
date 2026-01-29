@@ -3,16 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>アイランドフェス ギャラリー</title>
+    <title>アイランドフェス ギャラリー（ナビ付）</title>
     <style>
-        /* --- ここにCSS（デザイン）を書いています --- */
         body {
             margin: 0;
             padding: 30px;
             background-color: #ffffff;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
+            align-items: center;
             overflow-x: hidden;
+            font-family: sans-serif;
         }
 
         .gallery-container {
@@ -24,7 +25,7 @@
             position: relative;
         }
 
-        /* 背景暗転の設定 */
+        /* 背景暗転 */
         .gallery-container::before {
             content: "";
             position: fixed;
@@ -32,24 +33,22 @@
             left: 0;
             width: 100vw;
             height: 100vh;
-            background: rgba(0, 0, 0, 0.75);
+            background: rgba(0, 0, 0, 0.8);
             opacity: 0;
             visibility: hidden;
             z-index: 50;
+            transition: 0.3s;
             pointer-events: none;
-            transition: all 0.3s ease;
-            transition-delay: 0s;
         }
-
-        /* ホバーされた時の暗転（0.3秒の溜め） */
-        .gallery-container:has(.gallery-item:hover)::before {
+        /* ホバーまたはクリック（ターゲット）時に暗転 */
+        .gallery-container:has(.gallery-item:hover)::before,
+        .gallery-container:has(.gallery-item:target)::before {
             opacity: 1;
             visibility: visible;
-            transition-delay: 0.3s;
+            transition-delay: 0.2s;
         }
 
         .gallery-item {
-            position: relative;
             aspect-ratio: 16 / 9;
             z-index: 1;
         }
@@ -59,47 +58,131 @@
             height: 100%;
             object-fit: cover;
             border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
             cursor: pointer;
             transition: all 0.2s ease-out;
-            transition-delay: 0s; 
         }
 
-        /* ホバー時の拡大設定（0.3秒の溜め） */
-        .gallery-item:hover {
+        /* --- ボタンのスタイル --- */
+        .nav-buttons {
+            position: fixed;
+            bottom: 5%; /* 画像の下側に配置 */
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 100px; /* ボタン同士の間隔 */
+            opacity: 0;
+            visibility: hidden;
+            z-index: 102;
+            transition: 0.3s;
+        }
+
+        .nav-buttons a {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            text-decoration: none;
+            font-size: 40px;
+            font-weight: bold;
+            padding: 10px 30px;
+            border-radius: 50px;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255,255,255,0.3);
+            transition: 0.2s;
+        }
+
+        .nav-buttons a:hover {
+            background: rgba(255, 255, 255, 0.4);
+            transform: scale(1.1);
+        }
+
+        /* --- ホバー＆クリック時の拡大挙動 --- */
+        .gallery-item:hover, .gallery-item:target {
             z-index: 100;
         }
 
-        .gallery-item:hover img {
+        /* ホバーまたはクリックされた画像本体 */
+        .gallery-item:hover img, .gallery-item:target img {
             position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%) scale(1.6);
-            width: 85vw;
+            width: 80vw;
             max-width: 800px;
             height: auto;
             aspect-ratio: 16 / 9;
-            box-shadow: 0 30px 60px rgba(0,0,0,0.7);
             z-index: 101;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.8);
             transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-            transition-delay: 0.3s;
+            transition-delay: 0.2s;
         }
 
+        /* ボタンを表示させる（画像が拡大されている時だけ） */
+        .gallery-item:hover .nav-buttons, 
+        .gallery-item:target .nav-buttons {
+            opacity: 1;
+            visibility: visible;
+            transition-delay: 0.4s; /* 画像が大きくなった後に表示 */
+        }
+
+        /* スマホ対応 */
         @media (max-width: 600px) {
             .gallery-container { grid-template-columns: 1fr; }
+            .nav-buttons { gap: 50px; }
         }
     </style>
 </head>
 <body>
 
     <div class="gallery-container">
-        <div class="gallery-item"><img src="images/slide1.jpg" alt="Slide 1"></div>
-        <div class="gallery-item"><img src="images/slide2.jpg" alt="Slide 2"></div>
-        <div class="gallery-item"><img src="images/slide3.jpg" alt="Slide 3"></div>
-        <div class="gallery-item"><img src="images/slide4.jpg" alt="Slide 4"></div>
-        <div class="gallery-item"><img src="images/slide5.jpg" alt="Slide 5"></div>
-        <div class="gallery-item"><img src="images/slide6.jpg" alt="Slide 6"></div>
+        <div class="gallery-item" id="slide1">
+            <img src="images/slide1.jpg">
+            <div class="nav-buttons">
+                <a href="#slide6">＜</a>
+                <a href="#slide2">＞</a>
+            </div>
+        </div>
+
+        <div class="gallery-item" id="slide2">
+            <img src="images/slide2.jpg">
+            <div class="nav-buttons">
+                <a href="#slide1">＜</a>
+                <a href="#slide3">＞</a>
+            </div>
+        </div>
+
+        <div class="gallery-item" id="slide3">
+            <img src="images/slide3.jpg">
+            <div class="nav-buttons">
+                <a href="#slide2">＜</a>
+                <a href="#slide4">＞</a>
+            </div>
+        </div>
+
+        <div class="gallery-item" id="slide4">
+            <img src="images/slide4.jpg">
+            <div class="nav-buttons">
+                <a href="#slide3">＜</a>
+                <a href="#slide5">＞</a>
+            </div>
+        </div>
+
+        <div class="gallery-item" id="slide5">
+            <img src="images/slide5.jpg">
+            <div class="nav-buttons">
+                <a href="#slide4">＜</a>
+                <a href="#slide6">＞</a>
+            </div>
+        </div>
+
+        <div class="gallery-item" id="slide6">
+            <img src="images/slide6.jpg">
+            <div class="nav-buttons">
+                <a href="#slide5">＜</a>
+                <a href="#slide1">＞</a>
+            </div>
+        </div>
     </div>
+
+    <p style="margin-top: 50px; color: #888; font-size: 12px;">※画像の外をクリックするとリセットされます</p>
 
 </body>
 </html>
