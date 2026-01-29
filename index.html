@@ -1,59 +1,60 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-<meta charset="UTF-8">
-<title>Hover Slides</title>
-
-<style>
+<div class="overlay">
 body {
   margin: 0;
   padding: 24px;
   background: transparent;
-  font-family: sans-serif;
 }
 
-/* 2列×3行 */
+/* グリッド */
 .grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 20px;
+  position: relative;
 }
 
-/* 16:9 スライド枠 */
+/* 各スライド */
 .slide {
   position: relative;
   aspect-ratio: 16 / 9;
-  overflow: visible;
 }
 
-/* 画像 */
+/* 通常画像 */
 .slide img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   border-radius: 8px;
-  transition: transform 0.3s ease;
   cursor: pointer;
+  transition: transform 0.3s ease;
+  z-index: 1;
 }
 
-/* ホバー拡大 */
-.slide img:hover {
-  transform: scale(1.7);
-  z-index: 10;
+/* ===== オーバーレイ ===== */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  z-index: 50;
 }
-</style>
-</head>
 
-<body>
+/* ===== ホバー時の処理 ===== */
+.slide:hover img {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 70vw;
+  height: auto;
+  max-height: 80vh;
+  transform: translate(-50%, -50%);
+  z-index: 100;
+}
 
-<div class="grid">
-  <div class="slide"><img src="images/slide1.jpg" alt=""></div>
-  <div class="slide"><img src="images/slide2.jpg" alt=""></div>
-  <div class="slide"><img src="images/slide3.jpg" alt=""></div>
-  <div class="slide"><img src="images/slide4.jpg" alt=""></div>
-  <div class="slide"><img src="images/slide5.jpg" alt=""></div>
-  <div class="slide"><img src="images/slide6.jpg" alt=""></div>
+/* ホバー中はオーバーレイ表示 */
+.grid:hover ~ .overlay {
+  opacity: 1;
+}
 </div>
-
-</body>
-</html>
