@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Island Fest Gallery - Max Expansion</title>
+    <title>Island Fest Gallery - Adjusted</title>
     <style>
-        /* --- 全体リセット --- */
+        /* --- 1. 基本リセット --- */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -19,21 +19,22 @@
             display: block;
         }
 
-        /* --- ギャラリー外枠（ホバー前は完璧とのことなので維持） --- */
+        /* --- 2. ギャラリー外枠（ホバー前は完璧とのことなので維持） --- */
         .gallery-container {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 2px;
             width: 100%;
+            margin: 0;
         }
 
-        /* --- 背景暗転 --- */
+        /* --- 3. 背景暗転 --- */
         .gallery-container::before {
             content: "";
             position: fixed;
             top: 0; left: 0;
-            width: 100vw; height: 100vh;
-            background: rgba(0, 0, 0, 0.85);
+            width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.8);
             opacity: 0;
             visibility: hidden;
             z-index: 100;
@@ -47,6 +48,7 @@
             visibility: visible;
         }
 
+        /* --- 4. 画像アイテム --- */
         .gallery-item {
             position: relative;
             aspect-ratio: 16 / 9;
@@ -61,9 +63,10 @@
             cursor: pointer;
             transition: all 0.3s ease;
             backface-visibility: hidden;
+            will-change: transform;
         }
 
-        /* --- 【修正】ホバー & クリック時の拡大挙動 --- */
+        /* --- 5. ホバー & クリック時の拡大（ここを微調整しました） --- */
         .gallery-item:hover,
         .gallery-item:target {
             z-index: 200;
@@ -74,16 +77,19 @@
             position: fixed;
             top: 50%;
             left: 50%;
-            /* scaleを使わず、位置調整のみに絞る */
-            transform: translate(-50%, -50%);
+            /* 拡大率を 1.6 -> 1.3 に落として枠内への収まりを優先 */
+            transform: translate(-50%, -50%) scale(1.3);
             
-            /* 【ここが重要】左右が切れないギリギリ（幅96%）に設定 */
-            width: 96vw; 
-            max-width: 96%; /* 親要素(iframe)に対しても96%に制限 */
-            
+            /* 幅を 90vw -> 95% に。Notionの枠に対して5%の余裕を持たせます */
+            width: 95%; 
+            max-width: 750px; /* あまりに大きくなりすぎないよう制限 */
             height: auto;
             aspect-ratio: 16 / 9;
             z-index: 201;
-            box-shadow: 0 30px 60px rgba(0,0,0,0.8);
-            transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
-            transition-delay:
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+            
+            transition: all 0.35s cubic-bezier(0.25, 1, 0.5, 1);
+            transition-delay: 0.05s;
+        }
+
+        /* --- 6
